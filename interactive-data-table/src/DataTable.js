@@ -9,7 +9,6 @@ const DataTable = () => {
   const [data, setData] = useState([]);
   const [search, setSearch] = useState('');
   const [sortConfig, setSortConfig] = useState(null);
-  const [filteredData, setFilteredData] = useState([]);
 
   // Fetch data from Google Sheets
   useEffect(() => {
@@ -31,39 +30,42 @@ const DataTable = () => {
     fetchData();
   }, []);
 
-  const handleSearch = debounce((query) => {
-    const searchQuery = typeof query === 'string' ? query.toLowerCase() : '';
-    setSearch(searchQuery);
+  // Debounced search function
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((query) => {
+        setSearch(query);
+      }, 300),
+    []
+  );
 
-    if (!searchQuery) {
-      setFilteredData(data); // Reset to all data if the search query is empty
-      return;
-    }
+  const handleSearchInputChange = (event) => {
+    const value = event.target.value;
+    debouncedSearch(value); // Trigger the debounced search function
+  };
 
-    const filtered = data.filter((item) =>
-      item['Domain']?.toLowerCase().includes(searchQuery)
-    );
-    setFilteredData(filtered);
-  }, 150);
   // Sort data based on a key
   const sortData = (key) => {
-    const direction = sortConfig?.key === key && sortConfig.direction === 'ascending'
-      ? 'descending'
-      : 'ascending';
+    const direction =
+      sortConfig?.key === key && sortConfig.direction === 'ascending'
+        ? 'descending'
+        : 'ascending';
     setSortConfig({ key, direction });
   };
 
   // Filter and sort data based on search input and sort configuration
   const filteredAndSortedData = useMemo(() => {
-    const lowercasedSearch = typeof search === 'string' ? search.toLowerCase() : '';
+    const lowercasedSearch = search.toLowerCase();
     const filtered = data.filter((item) =>
       item['Domain']?.toLowerCase().includes(lowercasedSearch)
     );
 
     if (sortConfig) {
       return filtered.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) return sortConfig.direction === 'ascending' ? -1 : 1;
-        if (a[sortConfig.key] > b[sortConfig.key]) return sortConfig.direction === 'ascending' ? 1 : -1;
+        if (a[sortConfig.key] < b[sortConfig.key])
+          return sortConfig.direction === 'ascending' ? -1 : 1;
+        if (a[sortConfig.key] > b[sortConfig.key])
+          return sortConfig.direction === 'ascending' ? 1 : -1;
         return 0;
       });
     }
@@ -71,40 +73,19 @@ const DataTable = () => {
     return filtered;
   }, [data, search, sortConfig]);
 
-  // Handle search input changes
-  // const handleSearch = debounce((query) => {
-  //   // Process search query
-  //   //console.log(query);
-  //   setSearch(query || '');
-  // }, 100); // 300ms debounce
-
-
-  // Clear search input and reset results immediately
   const handleClearSearch = () => {
     setSearch('');
-    handleSearch.cancel();
-  }
-  const Row = ({ index, style }) => {
-    const row = filteredData[index];
-    return (
-      <div style={style} className="row">
-        {Object.values(row).map((value, i) => (
-          <span key={i} className="cell">
-            {value}
-          </span>
-        ))}
-      </div>
-    );
+    debouncedSearch('');
   };
+
   return (
     <div className="data-table-wrapper">
       <div className="search-container">
-        {/* <h2> Data Table</h2> */}
         <input
           type="text"
           placeholder="Search by Domain Name"
           value={search}
-          onChange={handleSearch}
+          onChange={handleSearchInputChange} // Immediate update of search
         />
         <button className="search-button" onClick={handleClearSearch}>
           Clear
