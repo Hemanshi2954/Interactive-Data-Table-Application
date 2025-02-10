@@ -2,6 +2,9 @@
 
 An interactive web application that displays a data table fetched from Google Sheets with sorting and filtering functionalities.
 
+<img src="./interactive-data-table/public/loginpage.png" alt="loginpage" >
+<img src="./interactive-data-table/public/searchbar.png" alt="loginpage" >
+
 ## 🚀 Features
 - **Login Page**: Simple authentication (Username: `demo`, Password: `demo`)
 - **Data Fetching**: Loads data from a public Google Sheets document
