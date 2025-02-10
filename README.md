@@ -13,7 +13,7 @@ An interactive web application that displays a data table fetched from Google Sh
 🔗 [Interactive Data Table Application](https://interactive-data-table-application-x91y.onrender.com)
 
 ## 📦 Tech Stack
-- **Frontend**: HTML, CSS, JavaScript
+- **Frontend**: HTML, CSS, JavaScript , React.Js 
 - **Backend**: None (Client-side processing)
 - **Deployment**: Render
 
